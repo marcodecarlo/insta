@@ -38,6 +38,11 @@ export default function Header() {
             <div className="flex space-x-4 items-center">
                 <HomeIcon className="hidden md:inline-flex  h-6 cursor-pointer hover:scale-125 transition-tranform duration-200 ease-out"/>
                 <PlusCircleIcon className="h-6 cursor-pointer hover:scale-125 transition-tranform duration-200 ease-out"/>
+                <img
+                    src="/images/tom.png"
+                    alt="user-image"
+                    className="h-10 rounded-full cursor-pointer"
+                />
                 <button>Sign in</button>
             </div>
         </div>
