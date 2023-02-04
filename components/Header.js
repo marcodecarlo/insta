@@ -53,7 +53,7 @@ export default function Header() {
                         />
                     </>
                 ) : (
-                    <button onClick={signIn}>Sign in</button>
+                    <button onClick={sig- nIn}>Sign in</button>
                 )
                 }
             </div>
