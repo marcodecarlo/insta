@@ -1,8 +1,11 @@
 import Image from 'next/image';
 import React from 'react';
 import {MagnifyingGlassIcon, PlusCircleIcon, HomeIcon} from "@heroicons/react/24/outline";
+import {useSession, signIn, signOut} from "next-auth/react";
 
 export default function Header() {
+    const {data: session} = useSession();
+
     return <div>
         {/* Left */}
 
@@ -36,14 +39,23 @@ export default function Header() {
                 />
             </div>
             <div className="flex space-x-4 items-center">
-                <HomeIcon className="hidden md:inline-flex  h-6 cursor-pointer hover:scale-125 transition-tranform duration-200 ease-out"/>
-                <PlusCircleIcon className="h-6 cursor-pointer hover:scale-125 transition-tranform duration-200 ease-out"/>
-                <img
-                    src="/images/tom.png"
-                    alt="user-image"
-                    className="h-10 rounded-full cursor-pointer"
-                />
-                <button>Sign in</button>
+                <HomeIcon
+                    className="hidden md:inline-flex  h-6 cursor-pointer hover:scale-125 transition-tranform duration-200 ease-out"/>
+                {session ? (
+                    <>
+                        <PlusCircleIcon
+                            className="h-6 cursor-pointer hover:scale-125 transition-tranform duration-200 ease-out"/>
+                        <img
+                            onClick={signOut}
+                            src={session.user.image}
+                            alt="user-image"
+                            className="h-10 rounded-full cursor-pointer"
+                        />
+                    </>
+                ) : (
+                    <button onClick={signIn}>Sign in</button>
+                )
+                }
             </div>
         </div>
 
