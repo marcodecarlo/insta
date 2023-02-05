@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import Moment from "react-moment";
-import {db} from "../firebase";
+import { db } from "../firebase";
 import {
     EllipsisHorizontalIcon,
     HeartIcon,
@@ -8,7 +8,7 @@ import {
     BookmarkIcon,
     FaceSmileIcon,
 } from "@heroicons/react/24/outline";
-import {HeartIcon as HeartIconFilled} from "@heroicons/react/24/solid";
+import { HeartIcon as HeartIconFilled } from "@heroicons/react/24/solid";
 import {
     addDoc,
     collection,
@@ -20,14 +20,15 @@ import {
     serverTimestamp,
     setDoc,
 } from "firebase/firestore";
-import {useSession} from "next-auth/react";
+import { useRecoilState } from "recoil";
+import { userState } from "../atom/userAtom";
 
-export default function Post({img, userImg, caption, username, id}) {
-    const {data: session} = useSession();
+export default function Post({ img, userImg, caption, username, id }) {
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
     const [likes, setLikes] = useState([]);
     const [hasLiked, setHasLiked] = useState(false);
+    const [currentUser] = useRecoilState(userState);
 
     useEffect(() => {
         const unsubscribe = onSnapshot(
@@ -50,16 +51,16 @@ export default function Post({img, userImg, caption, username, id}) {
 
     useEffect(() => {
         setHasLiked(
-            likes.findIndex((like) => like.id === session?.user.uid) !== -1
+            likes.findIndex((like) => like.id === currentUser?.uid) !== -1
         );
     }, [likes]);
 
     async function likePost() {
         if (hasLiked) {
-            await deleteDoc(doc(db, "posts", id, "likes", session.user.uid));
+            await deleteDoc(doc(db, "posts", id, "likes", currentUser?.uid));
         } else {
-            await setDoc(doc(db, "posts", id, "likes", session.user.uid), {
-                username: session.user.username,
+            await setDoc(doc(db, "posts", id, "likes", currentUser?.uid), {
+                username: currentUser?.username,
             });
         }
     }
@@ -70,8 +71,8 @@ export default function Post({img, userImg, caption, username, id}) {
         setComment("");
         await addDoc(collection(db, "posts", id, "comments"), {
             comment: commentToSend,
-            username: session.user.username,
-            userImage: session.user.image,
+            username: currentUser?.username,
+            userImage: currentUser?.userImg,
             timestamp: serverTimestamp(),
         });
     }
@@ -87,16 +88,16 @@ export default function Post({img, userImg, caption, username, id}) {
                     alt={username}
                 />
                 <p className="font-bold flex-1">{username}</p>
-                <EllipsisHorizontalIcon className="h-5"/>
+                <EllipsisHorizontalIcon className="h-5" />
             </div>
 
             {/* Post Image */}
 
-            <img className="object-cover w-full" src={img} alt=""/>
+            <img className="object-cover w-full" src={img} alt="" />
 
             {/* Post Buttons  */}
 
-            {session && (
+            {currentUser && (
                 <div className="flex justify-between px-4 pt-4">
                     <div className="flex space-x-4">
                         {hasLiked ? (
@@ -105,12 +106,12 @@ export default function Post({img, userImg, caption, username, id}) {
                                 className="text-red-400 btn"
                             />
                         ) : (
-                            <HeartIcon onClick={likePost} className="btn"/>
+                            <HeartIcon onClick={likePost} className="btn" />
                         )}
 
-                        <ChatBubbleLeftIcon className="btn"/>
+                        <ChatBubbleLeftIcon className="btn" />
                     </div>
-                    <BookmarkIcon className="btn"/>
+                    <BookmarkIcon className="btn" />
                 </div>
             )}
 
@@ -144,9 +145,9 @@ export default function Post({img, userImg, caption, username, id}) {
             )}
 
             {/* Post input box */}
-            {session && (
+            {currentUser && (
                 <form className="flex items-center p-4">
-                    <FaceSmileIcon className="h-7"/>
+                    <FaceSmileIcon className="h-7" />
                     <input
                         value={comment}
                         onChange={(event) => setComment(event.target.value)}
